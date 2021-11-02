@@ -22,6 +22,58 @@ intents.members = True
 client = commands.Bot(command_prefix='.',intents=intents)
 client.remove_command('help')
 
+#***********************************************#
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+
+@client.command()
+async def sex(ctx):
+    await ctx.send("Im gonna ass fuck you!")
+
+@client.command()
+async def jew(ctx):
+    embed = discord.Embed(
+        color=discord.Color.red()
+    )
+    embed.set_author(name='HEATING SHOWERS')
+    embed.add_field(name="These are gonna be toasty", value='Yumm!', inline="False")
+    
+    message = await ctx.send(embed=embed)
+
+    time.sleep(2)
+
+    await message.delete()
+
+@client.command()
+async def mat(ctx):
+    await ctx.send("Mat fag")
+
+@client.command()
+async def sus(ctx):
+    await ctx.send("Sacha")
+
+@client.command(aliases=['beaner', 'spic'])
+async def carlos(ctx):
+    massge = await ctx.send("nigger")
+    time.sleep(2)
+    ctx.message.delete()
+
+
+@client.command()
+async def kys(ctx):
+    await ctx.send("kys @"+str(ctx.author.name))
+
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE 
+# REMOVE WHEN DONE
+#******************************************************************#
 @client.event
 async def on_ready():
     print("Bot is ready")
@@ -50,7 +102,6 @@ async def ping(ctx):
 @client.command()
 async def hi(ctx):
     await ctx.send("Hello I am BeanerBot.")
-    
 
 @client.command()
 async def help(ctx):
@@ -81,7 +132,7 @@ async def trivia(ctx):
 
         embed = discord.Embed(
         color=discord.Color.green()
-        )   
+        )
         embed.title= 'Trivia!'
         embed.add_field(name="Category", value=(question.category), inline="False")
         embed.add_field(name="Type", value=(question.type), inline="False")
@@ -131,35 +182,69 @@ async def trivia(ctx):
     
 @client.event
 async def on_reaction_add(reaction, user):
+    user_list = []
+    if str(user) not in user_list:
+        print("=========== ADDED TO LIST ==============")
+        user_list += [user]
+        print(user_list)
+    else:
+        print("=--=--=-=-=- DUPLICATED =-=-=-=-=")
+    
     reactions = reaction.message.reactions
     # DO WHAT YOU WANT HERE 
     if(str(user) != "BeanerBot#0361"):
+
         print(str(user) +"\t "+ str(reaction))
+
         if(str(reaction) == "<:pepe:829529597078536212>"):
-            print("=========== NEW WINNER ===============")
-            await reaction.message.delete()
+            if (user_list[0] == user):
+
+                print("=========== WINNER MESSAGGE ===============")
+
+                #await reaction.message.delete()
+                
+                embed = discord.Embed(
+                    color=discord.Color.green()
+                    )  
+                embed.title = 'Winner'
+                embed.add_field(name=(str(user)), value="Has won 50 Social Credits!", inline="False")
+
+                await reaction.message.edit(embed=embed)
+        else:
+            print("=========== GAME END ===============")
+
+            #await reaction.message.delete()
+            
+            embed = discord.Embed(
+                color=discord.Color.red()
+                )  
+            embed.title = 'Losser'
+            embed.add_field(name=(str(user)), value="Hold this: L", inline="False")
+
+            await reaction.message.edit(embed=embed)
+           # new(user)
+
+
+def new(user):
+    
+    print(user)
+    @client.event
+    
+    async def newWinner(ctx):
+        # DO WHAT YOU WANT HERE 
+        if(str(user) != "BeanerBot#0361"):
+
             embed = discord.Embed(
                 color=discord.Color.green()
                 )  
             embed.title = 'Winner'
             embed.add_field(name=(str(user)), value="Has won 50 points!", inline="False")
 
-            newWinner(user)
-
-@client.event
-async def newWinner(user,ctx):
-    # DO WHAT YOU WANT HERE 
-    if(str(user) != "BeanerBot#0361"):
-        print("=========== NEW WINNER ===============")
-
-        embed = discord.Embed(
-            color=discord.Color.green()
-             )  
-        embed.title = 'Winner'
-        embed.add_field(name=(str(user)), value="Has won 50 points!", inline="False")
-
-        message = await ctx.send(embed=embed)
-            
+            print("_-__-__-__-__-__- SENDING MESSAGE -__---_--__-_--__-")
+            # Sending message??
+            message = await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+        
 
             
 
