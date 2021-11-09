@@ -7,14 +7,18 @@ import json
 from discord.webhook import AsyncWebhookAdapter
 from types import SimpleNamespace
 import time
+import csv
+
 
 import requests
 import re
 import random
 
 # ------ #TODO# ------
-# 1# send winning message 
+# 1# Fix winning message
 # 2# SAVE SCORE (LOOP AS .CSV AND SAVE AFTER WIN)
+#    Play music when start a game...
+#    
 # 3# more games / categories 
 
 intents = discord.Intents.default()
@@ -56,6 +60,11 @@ async def mat(ctx):
 async def sus(ctx):
     await ctx.send("Sacha")
 
+@client.command()
+async def tom(ctx):
+    await ctx.send("I failed math three times!!")
+
+
 @client.command(aliases=['beaner', 'spic'])
 async def carlos(ctx):
     massge = await ctx.send("nigger")
@@ -67,6 +76,13 @@ async def carlos(ctx):
 async def kys(ctx):
     await ctx.send("kys @"+str(ctx.author.name))
 
+    #mateus
+@client.command()
+async def antivax(ctx):
+    await ctx.send("Mateus lul: GoVerNment is GonNA CoNtRoL mE")
+
+
+
 # REMOVE WHEN DONE 
 # REMOVE WHEN DONE 
 # REMOVE WHEN DONE 
@@ -74,16 +90,25 @@ async def kys(ctx):
 # REMOVE WHEN DONE 
 # REMOVE WHEN DONE
 #******************************************************************#
+
 @client.event
 async def on_ready():
     print("Bot is ready")
 
+
+
 @client.command()
 async def getmember(ctx):
-    member_list = ''
-    for member in ctx.guild.members:
-        member_list += member.name
-        print(member.name)
+    username = ctx.message.author.name
+    if(str(username) == "TheMemer27"):
+        member_list = ''
+        for member in ctx.guild.members:
+            member_list += member.name
+            print(member.name)
+            await ctx.send(member.name)
+
+    else:
+        await ctx.send("Youre not admin")
 
 
 @client.event
@@ -138,7 +163,7 @@ async def trivia(ctx):
         embed.add_field(name="Type", value=(question.type), inline="False")
         embed.add_field(name="Difficulty", value=(question.difficulty), inline="False")
         message = await ctx.send(embed=embed)
-        i = 1
+        i = 5
         while i > 0:
             print(i)
 
@@ -218,7 +243,7 @@ async def on_reaction_add(reaction, user):
             embed = discord.Embed(
                 color=discord.Color.red()
                 )  
-            embed.title = 'Losser'
+            embed.title = 'Looser'
             embed.add_field(name=(str(user)), value="Hold this: L", inline="False")
 
             await reaction.message.edit(embed=embed)
@@ -229,7 +254,6 @@ def new(user):
     
     print(user)
     @client.event
-    
     async def newWinner(ctx):
         # DO WHAT YOU WANT HERE 
         if(str(user) != "BeanerBot#0361"):
