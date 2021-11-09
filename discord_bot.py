@@ -79,7 +79,7 @@ async def kys(ctx):
     #mateus
 @client.command()
 async def antivax(ctx):
-    await ctx.send("Mateus lul: GoVerNment is GonNA CoNtRoL mE")
+    await ctx.send("Mateus : GoVerNment is GonNA CoNtRoL mE")
 
 
 
@@ -93,7 +93,9 @@ async def antivax(ctx):
 
 @client.event
 async def on_ready():
-    print("Bot is ready")
+
+    for member in client.get_all_members():
+        print(member)
 
 
 
@@ -110,19 +112,25 @@ async def getmember(ctx):
     else:
         await ctx.send("Youre not admin")
 
+# Greet new suer
 
 @client.event
 async def on_member_join(member):
     print(f'{member} has joined a server.')
 
+#Send message when a user leaves
+
 @client.event
 async def on_member_remove(member):
     print(f'{member} has left a server.')
+
+# Respond with latency in ms
 
 @client.command()
 async def ping(ctx):
     await ctx.send(f"pong: {round(client.latency*1000)}ms" )
 
+# respond to Hi
 
 @client.command()
 async def hi(ctx):
@@ -137,6 +145,8 @@ async def help(ctx):
     embed.add_field(name=".trivia", value='Starts a quick game of Trivia', inline="False")
     
     await ctx.send(embed=embed)
+
+# Start a game of trivia
 
 @client.command()
 async def trivia(ctx):
@@ -163,7 +173,7 @@ async def trivia(ctx):
         embed.add_field(name="Type", value=(question.type), inline="False")
         embed.add_field(name="Difficulty", value=(question.difficulty), inline="False")
         message = await ctx.send(embed=embed)
-        i = 5
+        i = 1
         while i > 0:
             print(i)
 
@@ -181,7 +191,7 @@ async def trivia(ctx):
 
         await message.delete()
 
-        emoji = discord.utils.get(ctx.guild.emojis, name="pepe")
+        # emoji = discord.utils.get(ctx.guild.emojis, name="pepe")
 
         embed2 = discord.Embed(
         color=discord.Color.green()
@@ -192,7 +202,7 @@ async def trivia(ctx):
         embed2.add_field(name=("🅰 : "+str(question.incorrect_answers[0])), value="_______", inline="False")
         embed2.add_field(name=("🅱️ : "+str(question.incorrect_answers[1])), value="_______", inline="False")
         embed2.add_field(name=("© : "+str(question.incorrect_answers[2])), value="_______", inline="False")
-        embed2.add_field(name=("Pepe : "+str(question.correct_answer)), value="_______", inline="False")
+        embed2.add_field(name=("🌹 : "+str(question.correct_answer)), value="_______", inline="False")
 
         ##embed2.add_field(name="Asnwers", value=(question.incorrect_answers), inline="False")
 
@@ -201,7 +211,7 @@ async def trivia(ctx):
         await message2.add_reaction("🅰" )
         await message2.add_reaction("🅱️")
         await message2.add_reaction("©")
-        await message2.add_reaction(str(emoji))
+        await message2.add_reaction("🌹")
 
         time.sleep(3)
     
@@ -221,7 +231,7 @@ async def on_reaction_add(reaction, user):
 
         print(str(user) +"\t "+ str(reaction))
 
-        if(str(reaction) == "<:pepe:829529597078536212>"):
+        if(str(reaction) == "🌹"):
             if (user_list[0] == user):
 
                 print("=========== WINNER MESSAGGE ===============")
@@ -235,6 +245,13 @@ async def on_reaction_add(reaction, user):
                 embed.add_field(name=(str(user)), value="Has won 50 Social Credits!", inline="False")
 
                 await reaction.message.edit(embed=embed)
+
+                await reaction.message.clear_reaction("🅰")
+                await reaction.message.clear_reaction("🅱️")
+                await reaction.message.clear_reaction("©")
+                await reaction.message.clear_reaction("🌹")
+
+                
         else:
             print("=========== GAME END ===============")
 
@@ -247,7 +264,14 @@ async def on_reaction_add(reaction, user):
             embed.add_field(name=(str(user)), value="Hold this: L", inline="False")
 
             await reaction.message.edit(embed=embed)
-           # new(user)
+
+            await reaction.message.clear_reaction("🅰")
+            await reaction.message.clear_reaction("🅱️")
+            await reaction.message.clear_reaction("©")
+            await reaction.message.clear_reaction("🌹")
+            
+            
+            #new(user)
 
 
 def new(user):
