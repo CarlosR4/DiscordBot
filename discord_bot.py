@@ -1,14 +1,16 @@
+from logging import error
 import discord
 from discord import client
 from discord import message
 from discord.ext import commands
 import urllib.request, json
 import json
+from discord.utils import async_all
 from discord.webhook import AsyncWebhookAdapter
 from types import SimpleNamespace
 import time
 import csv
-
+import os
 
 import requests
 import re
@@ -24,7 +26,7 @@ import random
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix='.',intents=intents)
-client.remove_command('help')
+# client.remove_command('help')
 
 #***********************************************#
 # REMOVE WHEN DONE 
@@ -62,7 +64,7 @@ async def sus(ctx):
 
 @client.command()
 async def tom(ctx):
-    await ctx.send("I failed math three times!!")
+    await ctx.send("I failed math three times!! \n0-6 btw")
 
 
 @client.command(aliases=['beaner', 'spic'])
@@ -81,6 +83,9 @@ async def kys(ctx):
 async def antivax(ctx):
     await ctx.send("Mateus : GoVerNment is GonNA CoNtRoL mE")
 
+@client.command()
+async def evan(ctx):
+    await ctx.send("The tax avoider 👨🏾‍🌾.")
 
 
 # REMOVE WHEN DONE 
@@ -93,11 +98,39 @@ async def antivax(ctx):
 
 @client.event
 async def on_ready():
+    clients = []
 
+    cwd = os.getcwd()
+
+    # Create file "classroom(number).txt"
+    file_name = os.path.join(cwd, "clients.txt")
+
+    txt_file = open(file_name, "w")
+
+    #
+    clients_file = open("clients.txt","w",encoding="utf-8")
     for member in client.get_all_members():
+        print(member.name)
+        member_data = member.name
+        #print(repr(member_data))
+        raw_data = [member_data,"","",""]
+        try:
+            txt_file.write(str(raw_data)+'\n')
+        except:
+            print("Cant play lol")
+
+
+    txt_file.close()
+
+    resp = "Data file generated"
+    print(resp)
+
+'''
+    for member in 
+        clients += member
         print(member)
-
-
+    print(clients)
+    '''
 
 @client.command()
 async def getmember(ctx):
@@ -136,6 +169,7 @@ async def ping(ctx):
 async def hi(ctx):
     await ctx.send("Hello I am BeanerBot.")
 
+'''
 @client.command()
 async def help(ctx):
     embed = discord.Embed(
@@ -145,7 +179,7 @@ async def help(ctx):
     embed.add_field(name=".trivia", value='Starts a quick game of Trivia', inline="False")
     
     await ctx.send(embed=embed)
-
+'''
 # Start a game of trivia
 
 @client.command()
@@ -214,6 +248,93 @@ async def trivia(ctx):
         await message2.add_reaction("🌹")
 
         time.sleep(3)
+
+
+def save(user,credits):
+    cwd = os.getcwd()
+
+    # Open file "clients.txt" and save to a list
+    file_name = os.path.join(cwd, "clients.txt")
+
+    #txt_file = open(file_name, "r+")
+
+    with open('clients.txt', newline='') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+    print("Opened File.... Saved to data")
+    #print(data)
+
+    f.close()
+
+    print("Passed variable: "+user)
+
+    i = 0
+
+    for name in data:
+
+            client = re.sub(r'\W+', '', name[0])
+            #print(client)
+            if client == user:
+                print(name)
+                print("Found user")
+
+                name[1] = credits
+
+                print(name)
+                break
+            
+            i+=1
+
+            print(i)
+
+
+            #print(re.sub('[^a-zA-Z]+', '', name[0]))
+
+    #
+    clients_file = open("clients.txt","r+",encoding="utf-8")
+
+    with open('clients.txt', 'r+') as f:
+        
+        '''
+        write = csv.writer(f) 
+        #write.writerows(name)
+        write.writerows(map(lambda x: [x], data))
+        '''
+        for name in data:
+            clients_file.write(str(name)+'\n')
+
+
+    clients_file.close()
+       
+
+
+
+@client.command()
+async def test(ctx):
+    username = ctx.message.author.name
+    if(str(username) == "TheMemer27"):
+        save(str(username),50)
+
+    else:
+        await ctx.send("Youre not admin")
+
+    #
+    '''
+    clients_file = open("clients.txt","w",encoding="utf-8")
+    for member in client.get_all_members():
+        print(member.name)
+        member_data = member.name
+        #print(repr(member_data))
+        raw_data = [member_data,"","",""]
+        try:
+            txt_file.write(str(raw_data)+'\n')
+        except:
+            print("Cant play lol")
+
+
+    txt_file.close()
+    '''
     
 @client.event
 async def on_reaction_add(reaction, user):
