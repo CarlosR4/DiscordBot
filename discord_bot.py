@@ -11,31 +11,31 @@ from types import SimpleNamespace
 import time
 import csv
 import os
-
+from discord import FFmpegPCMAudio
+from discord import TextChannel
+from discord.utils import get
+from youtube_dl import YoutubeDL
 import requests
 import re
 import random
 
 # ------ #TODO# ------
-# 1# Fix winning message
-# 2# SAVE SCORE (LOOP AS .CSV AND SAVE AFTER WIN)
-#    Play music when start a game...
-#    
-# 3# more games / categories 
+# FIX SAVE SCORE (Lists gets saved within a list)
+# Stop music when game end.
+# Loop through questions....
+#
 
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix='.',intents=intents)
 # client.remove_command('help')
 
-#***********************************************#
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
+# List of categories
+category_dict = {'General Knowledge' : 9, 'Books' : 10, 'Film' : 11, 'Music' : 12, 'Musicals & Theatres' : 13, 'Television' : 14 ,'Video Games' : 15
+,'Board Games' : 16,'Science & Nature' : 17,'Computer Science' : 18,'Mathematics' :19 ,'Mythology' : 20 ,'Sports' : 21, 'Geography' : 22,'History':23
+,'Politics':24,'Art':25,'Celebrities' :26,'Animals':27,'Vehicles':28,'Anime':31}
 
+#***********************************************#
 @client.command()
 async def sex(ctx):
     await ctx.send("Im gonna ass fuck you!")
@@ -64,7 +64,7 @@ async def sus(ctx):
 
 @client.command()
 async def tom(ctx):
-    await ctx.send("I failed math three times!! \n0-6 btw")
+    await ctx.send("I failed math three times!! \n0-5 btw")
 
 
 @client.command(aliases=['beaner', 'spic'])
@@ -87,12 +87,6 @@ async def antivax(ctx):
 async def evan(ctx):
     await ctx.send("The tax avoider 👨🏾‍🌾.")
 
-
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
-# REMOVE WHEN DONE 
 # REMOVE WHEN DONE
 #******************************************************************#
 
@@ -110,14 +104,12 @@ async def on_ready():
     #
     clients_file = open("clients.txt","w",encoding="utf-8")
     for member in client.get_all_members():
-        print(member.name)
         member_data = member.name
-        #print(repr(member_data))
         raw_data = [member_data,"","",""]
         try:
             txt_file.write(str(raw_data)+'\n')
         except:
-            print("Cant play lol")
+            print(member.name + "Cant play lol")
 
 
     txt_file.close()
@@ -180,74 +172,102 @@ async def help(ctx):
     
     await ctx.send(embed=embed)
 '''
+# command to stop voice
+@client.command()
+async def leave(ctx):
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice.is_connected():
+        await voice.disconnect()
+    else:
+        await ctx.send("The bot is not connected to a voice channel.")
 # Start a game of trivia
 
 @client.command()
-async def trivia(ctx):
-    #url = 'https://opentdb.com/api.php?amount=1'
-    url = 'https://opentdb.com/api.php?amount=1&category=18&difficulty=medium&type=multiple'
-    req = urllib.request.Request(url)
+async def trivia(ctx,args):
+    global category_dict
+    print("Passed argument: " + args)
 
-    ##parsing response
-    r = urllib.request.urlopen(req).read()
-    cont = json.loads(r.decode('utf-8'), object_hook=lambda d: SimpleNamespace(**d))
-    counter = 0
-    print(cont)
-    ##parcing json
-    for question in cont.results:
-        counter += 1
-        print("Category:" + question.category +"\n Question:"+question.question+ "\nAwnsers:"+ str(question.incorrect_answers))
-        print("----")
+    if category_dict.get(args):
+        url = 'https://opentdb.com/api.php?amount=1&category='+str(category_dict.get(args)) +'&difficulty=medium&type=multiple'
+        req = urllib.request.Request(url)
 
-        embed = discord.Embed(
-        color=discord.Color.green()
-        )
-        embed.title= 'Trivia!'
-        embed.add_field(name="Category", value=(question.category), inline="False")
-        embed.add_field(name="Type", value=(question.type), inline="False")
-        embed.add_field(name="Difficulty", value=(question.difficulty), inline="False")
-        message = await ctx.send(embed=embed)
-        i = 1
-        while i > 0:
-            print(i)
+        try:
+            ##parsing response
+            r = urllib.request.urlopen(req).read()
+            cont = json.loads(r.decode('utf-8'), object_hook=lambda d: SimpleNamespace(**d))
+            counter = 0
+            channel = ctx.message.author.voice.channel
+            voice = get(client.voice_clients, guild=ctx.guild)
+            if voice and voice.is_connected():
+                await voice.move_to(channel)
+            else:
+                voice = await channel.connect()
 
-            time.sleep(1)
+            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+            FFMPEG_OPTIONS = {
+                'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+            voice = get(client.voice_clients, guild=ctx.guild)
 
-            embed.title= ('Trivia! '+f"{i}s")
-            
+            song = "https://www.youtube.com/watch?v=PCIvOGveIK0"
+            if not voice.is_playing():
+                with YoutubeDL(YDL_OPTIONS) as ydl:
+                    info = ydl.extract_info(song, download=False)
+                song_URL = info['url']
+                voice.play(FFmpegPCMAudio(song_URL, **FFMPEG_OPTIONS))
+                voice.is_playing()
+        except:
+            await ctx.send("For music, join a channel!")
+
+        for question in cont.results:
+            counter += 1
+            print("Category:" + args +"\n Question:"+question.question+ "\nAwnsers:"+ str(question.incorrect_answers))
+            print("____________")
+
+            embed = discord.Embed(
+            color=discord.Color.green()
+            )
+            embed.title= 'Trivia!'
+            embed.add_field(name="Category", value=(args), inline="False")
+            embed.add_field(name="Type", value=(question.type), inline="False")
+            embed.add_field(name="Difficulty", value=(question.difficulty), inline="False")
+            message = await ctx.send(embed=embed)
+            i = 1
+            while i > 0:
+
+                time.sleep(1)
+
+                embed.title= ('Trivia! '+f"{i}s")
+                
+                await message.edit(embed=embed)
+                i -= 1
+
+
+            embed.title= ('Trivia! Starting...')
+
             await message.edit(embed=embed)
-            i -= 1
 
+            await message.delete()
 
-        embed.title= ('Trivia! Starting...')
+            embed2 = discord.Embed(
+            color=discord.Color.green()
+            )  
 
-        await message.edit(embed=embed)
+            embed2.title= 'Trivia!'
+            embed2.title= question.question
+            embed2.add_field(name=("🅰 : "+str(question.incorrect_answers[0])), value="_______", inline="False")
+            embed2.add_field(name=("🅱️ : "+str(question.incorrect_answers[1])), value="_______", inline="False")
+            embed2.add_field(name=("© : "+str(question.incorrect_answers[2])), value="_______", inline="False")
+            embed2.add_field(name=("🌹 : "+str(question.correct_answer)), value="_______", inline="False")
 
-        await message.delete()
+            message2 = await ctx.send(embed=embed2)
+            
+            await message2.add_reaction("🅰" )
+            await message2.add_reaction("🅱️")
+            await message2.add_reaction("©")
+            await message2.add_reaction("🌹")
 
-        # emoji = discord.utils.get(ctx.guild.emojis, name="pepe")
-
-        embed2 = discord.Embed(
-        color=discord.Color.green()
-        )  
-
-        embed2.title= 'Trivia!'
-        embed2.title= question.question
-        embed2.add_field(name=("🅰 : "+str(question.incorrect_answers[0])), value="_______", inline="False")
-        embed2.add_field(name=("🅱️ : "+str(question.incorrect_answers[1])), value="_______", inline="False")
-        embed2.add_field(name=("© : "+str(question.incorrect_answers[2])), value="_______", inline="False")
-        embed2.add_field(name=("🌹 : "+str(question.correct_answer)), value="_______", inline="False")
-
-        ##embed2.add_field(name="Asnwers", value=(question.incorrect_answers), inline="False")
-
-        message2 = await ctx.send(embed=embed2)
-        
-        await message2.add_reaction("🅰" )
-        await message2.add_reaction("🅱️")
-        await message2.add_reaction("©")
-        await message2.add_reaction("🌹")
-
-        time.sleep(3)
+    else:
+        await ctx.send("Invalid Category!")
 
 
 def save(user,credits):
@@ -340,9 +360,7 @@ async def test(ctx):
 async def on_reaction_add(reaction, user):
     user_list = []
     if str(user) not in user_list:
-        print("=========== ADDED TO LIST ==============")
         user_list += [user]
-        print(user_list)
     else:
         print("=--=--=-=-=- DUPLICATED =-=-=-=-=")
     
@@ -413,31 +431,6 @@ def new(user):
             # Sending message??
             message = await ctx.send(embed=embed)
             await ctx.send(embed=embed)
-        
-
-            
-
-
-
-    #Working code (more complicated)
-    '''
-    r = requests.get(url='https://opentdb.com/api.php?amount=2')
-    print(r.json())
-    #data_ = json.loads(str(r))
-
-    await ctx.send("Received Trivia Questions...")
-    await ctx.send(r.json())
-    
-    with urllib.request.urlopen("") as url:
-        data = json.loads(url.read().decode())
-        data_dict = json.loads(data)
-
-        print(data)
-        print(data_dict['question'])
-        await ctx.send("Received Trivia Questions...")
-    '''
-    
-
 
 
 client.run('ODE2MTc4MDAwMTY3OTYwNjE2.YD3K_w.0jaZ7zEcU3aBkq-UU5j0t2MxXZ4')
