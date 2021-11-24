@@ -105,7 +105,7 @@ async def on_ready():
     clients_file = open("clients.txt","w",encoding="utf-8")
     for member in client.get_all_members():
         member_data = member.name
-        raw_data = [member_data,"","",""]
+        raw_data = member_data+','+"0"+',,'
         try:
             txt_file.write(str(raw_data)+'\n')
         except:
@@ -215,8 +215,9 @@ async def trivia(ctx,args):
                 song_URL = info['url']
                 voice.play(FFmpegPCMAudio(song_URL, **FFMPEG_OPTIONS))
                 voice.is_playing()
-        except:
-            await ctx.send("For music, join a channel!")
+        except Exception as e:
+            print(e)
+            #await ctx.send("For music, join a channel!")
 
         for question in cont.results:
             counter += 1
@@ -283,8 +284,6 @@ def save(user,credits):
         data = list(reader)
 
     print("Opened File.... Saved to data")
-    #print(data)
-
     f.close()
 
     print("Passed variable: "+user)
@@ -296,11 +295,15 @@ def save(user,credits):
             client = re.sub(r'\W+', '', name[0])
             #print(client)
             if client == user:
-                print(name)
+                print(name[1])
                 print("Found user")
 
-                name[1] = credits
+                socialCredits = int(name[1])
+                socialCredits + credits
+                name[1] = socialCredits
 
+                name[1] = credits
+                
                 print(name)
                 break
             
@@ -321,8 +324,15 @@ def save(user,credits):
         #write.writerows(name)
         write.writerows(map(lambda x: [x], data))
         '''
+
+
         for name in data:
-            clients_file.write(str(name)+'\n')
+
+            s = ","
+            #s = s.join(name)
+            converted_list = [str(element) for element in name]
+            joined_string = ",".join(converted_list)
+            clients_file.write(joined_string+'\n')
 
 
     clients_file.close()
@@ -333,7 +343,7 @@ def save(user,credits):
 @client.command()
 async def test(ctx):
     username = ctx.message.author.name
-    if(str(username) == "TheMemer27"):
+    if(str(username) == "TheMemer27" or str(username) == "AODA"):
         save(str(username),50)
 
     else:
