@@ -20,9 +20,8 @@ import re
 import random
 
 # ------ #TODO# ------
-# FIX SAVE SCORE (Lists gets saved within a list)
-# Stop music when game end.
-# Loop through questions....
+# Stop music when game end. (needs ctx)
+# Loop through questions.... (creates a bug with on_reaction_add - too many things for a single message)
 #
 
 intents = discord.Intents.default()
@@ -35,28 +34,14 @@ category_dict = {'General Knowledge' : 9, 'Books' : 10, 'Film' : 11, 'Music' : 1
 ,'Board Games' : 16,'Science & Nature' : 17,'Computer Science' : 18,'Mathematics' :19 ,'Mythology' : 20 ,'Sports' : 21, 'Geography' : 22,'History':23
 ,'Politics':24,'Art':25,'Celebrities' :26,'Animals':27,'Vehicles':28,'Anime':31}
 
+
+@client.command()
+async def categories(ctx):
+    await ctx.send("The following categories are available for trivia")
+    await ctx.send("General Knowledge\nBooks\nFilm\nMusic\nMusicals & Theatres\nTelevision\nVideo Games\nBoard Games\nScience & Nature\nComputer Science")
+    await ctx.send("Mathematics\nMythology\nSports\nGeography\nHistory\nPolitics\nArt\nCelebrities\nAnimals\nVehicles\nAnime")
+
 #***********************************************#
-@client.command()
-async def sex(ctx):
-    await ctx.send("Im gonna ass fuck you!")
-
-@client.command()
-async def jew(ctx):
-    embed = discord.Embed(
-        color=discord.Color.red()
-    )
-    embed.set_author(name='HEATING SHOWERS')
-    embed.add_field(name="These are gonna be toasty", value='Yumm!', inline="False")
-    
-    message = await ctx.send(embed=embed)
-
-    time.sleep(2)
-
-    await message.delete()
-
-@client.command()
-async def mat(ctx):
-    await ctx.send("Mat fag")
 
 @client.command()
 async def sus(ctx):
@@ -66,28 +51,11 @@ async def sus(ctx):
 async def tom(ctx):
     await ctx.send("I failed math three times!! \n0-5 btw")
 
-
-@client.command(aliases=['beaner', 'spic'])
-async def carlos(ctx):
-    massge = await ctx.send("nigger")
-    time.sleep(2)
-    ctx.message.delete()
-
-
-@client.command()
-async def kys(ctx):
-    await ctx.send("kys @"+str(ctx.author.name))
-
     #mateus
 @client.command()
 async def antivax(ctx):
     await ctx.send("Mateus : GoVerNment is GonNA CoNtRoL mE")
 
-@client.command()
-async def evan(ctx):
-    await ctx.send("The tax avoider 👨🏾‍🌾.")
-
-# REMOVE WHEN DONE
 #******************************************************************#
 
 @client.event
@@ -161,17 +129,7 @@ async def ping(ctx):
 async def hi(ctx):
     await ctx.send("Hello I am BeanerBot.")
 
-'''
-@client.command()
-async def help(ctx):
-    embed = discord.Embed(
-        color=discord.Color.orange()
-    )
-    embed.set_author(name='Help')
-    embed.add_field(name=".trivia", value='Starts a quick game of Trivia', inline="False")
-    
-    await ctx.send(embed=embed)
-'''
+
 # command to stop voice
 @client.command()
 async def leave(ctx):
@@ -297,34 +255,24 @@ def save(user,credits):
             if client == user:
                 print(name[1])
                 print("Found user")
-
+                
                 socialCredits = int(name[1])
-                socialCredits + credits
+                print(name[1])
+                socialCredits += credits
+                print(socialCredits)
                 name[1] = socialCredits
 
-                name[1] = credits
+                ##name[1] = credits
                 
                 print(name)
                 break
             
             i+=1
 
-            print(i)
-
-
-            #print(re.sub('[^a-zA-Z]+', '', name[0]))
-
     #
     clients_file = open("clients.txt","r+",encoding="utf-8")
 
     with open('clients.txt', 'r+') as f:
-        
-        '''
-        write = csv.writer(f) 
-        #write.writerows(name)
-        write.writerows(map(lambda x: [x], data))
-        '''
-
 
         for name in data:
 
@@ -337,6 +285,49 @@ def save(user,credits):
 
     clients_file.close()
        
+@client.command()
+async def credits(ctx):
+    cwd = os.getcwd()
+
+    # Open file "clients.txt" and save to a list
+    file_name = os.path.join(cwd, "clients.txt")
+
+    #txt_file = open(file_name, "r+")
+
+    with open('clients.txt', newline='') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+    f.close()
+
+    print("Passed variable: "+ctx.message.author.name)
+
+    i = 0
+
+    for name in data:
+
+            client = re.sub(r'\W+', '', name[0])
+            #print(client)
+            if client == ctx.message.author.name:
+                print(name[1])
+                print("Found user")
+                
+                socialCredits = int(name[1])
+                print(name[1])
+
+
+                embed = discord.Embed(
+                    color=discord.Color.gold()
+                    )  
+                embed.title = 'Bank'
+                embed.add_field(name=(str(ctx.message.author.name)), value="You have "+name[1]+ " social credits.", inline="False")
+
+                await ctx.send(embed=embed)
+                
+                print(name)
+                break
+            
+            i+=1
 
 
 
@@ -349,22 +340,6 @@ async def test(ctx):
     else:
         await ctx.send("Youre not admin")
 
-    #
-    '''
-    clients_file = open("clients.txt","w",encoding="utf-8")
-    for member in client.get_all_members():
-        print(member.name)
-        member_data = member.name
-        #print(repr(member_data))
-        raw_data = [member_data,"","",""]
-        try:
-            txt_file.write(str(raw_data)+'\n')
-        except:
-            print("Cant play lol")
-
-
-    txt_file.close()
-    '''
     
 @client.event
 async def on_reaction_add(reaction, user):
@@ -400,6 +375,14 @@ async def on_reaction_add(reaction, user):
                 await reaction.message.clear_reaction("©")
                 await reaction.message.clear_reaction("🌹")
 
+                a_string = str(user)
+                split_string = str(a_string).split("#", 1)
+
+                substring = split_string[0]
+                print(substring)
+
+                save(str(substring),50)
+
                 
         else:
             print("=========== GAME END ===============")
@@ -418,29 +401,5 @@ async def on_reaction_add(reaction, user):
             await reaction.message.clear_reaction("🅱️")
             await reaction.message.clear_reaction("©")
             await reaction.message.clear_reaction("🌹")
-            
-            
-            #new(user)
-
-
-def new(user):
-    
-    print(user)
-    @client.event
-    async def newWinner(ctx):
-        # DO WHAT YOU WANT HERE 
-        if(str(user) != "BeanerBot#0361"):
-
-            embed = discord.Embed(
-                color=discord.Color.green()
-                )  
-            embed.title = 'Winner'
-            embed.add_field(name=(str(user)), value="Has won 50 points!", inline="False")
-
-            print("_-__-__-__-__-__- SENDING MESSAGE -__---_--__-_--__-")
-            # Sending message??
-            message = await ctx.send(embed=embed)
-            await ctx.send(embed=embed)
-
 
 client.run('ODE2MTc4MDAwMTY3OTYwNjE2.YD3K_w.0jaZ7zEcU3aBkq-UU5j0t2MxXZ4')
