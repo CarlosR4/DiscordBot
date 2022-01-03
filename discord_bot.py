@@ -402,4 +402,4 @@ async def on_reaction_add(reaction, user):
             await reaction.message.clear_reaction("©")
             await reaction.message.clear_reaction("🌹")
 
-client.run('ODE2MTc4MDAwMTY3OTYwNjE2.YD3K_w.0jaZ7zEcU3aBkq-UU5j0t2MxXZ4')
+client.run('YOUR_KEY_HERE')
